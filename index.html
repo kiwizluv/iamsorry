@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You 🤍</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Nunito:wght@400;600;700&family=Mali:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ======================================================
+   ✏️  EDIT THIS PART (see CONFIG in the <script> below)
+   ====================================================== */
+:root{
+  --bg:#fbf4ee; --card:#fffaf6; --ink:#2b1d24; --muted:#7a6670;
+  --rose:#d9536f; --rose-soft:#f6d5dc; --gold:#e8b86b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 20% 10%,#fde7ea 0,transparent 45%),
+             radial-gradient(circle at 85% 90%,#fbe9d4 0,transparent 40%),var(--bg);
+  min-height:100vh;overflow-x:hidden;
+}
+html[lang="th"] body,html[lang="th"] .serif{font-family:'Mali','Nunito',sans-serif}
+.serif{font-family:'Fraunces',Georgia,serif}
+
+/* floating hearts */
+#hearts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.fh{position:absolute;bottom:-40px;color:var(--rose);opacity:.18;animation:rise linear forwards}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+
+/* language toggle */
+.lang{position:fixed;top:16px;right:16px;z-index:20;display:flex;background:#fff;border-radius:999px;
+  box-shadow:0 4px 18px rgba(43,29,36,.08);padding:4px}
+.lang button{border:0;background:none;padding:7px 14px;border-radius:999px;font:600 14px 'Nunito',sans-serif;
+  color:var(--muted);cursor:pointer}
+.lang button[data-l="th"]{font-family:'Mali',sans-serif}
+.lang button.on{background:var(--rose);color:#fff}
+
+main{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 20px 60px}
+.slide{display:none;width:100%;max-width:560px;text-align:center;animation:fade .7s ease}
+.slide.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+h1{font-size:clamp(30px,7vw,46px);line-height:1.15;font-weight:600;margin-bottom:18px}
+h2{font-size:clamp(24px,5.5vw,34px);line-height:1.2;font-weight:600;margin-bottom:16px}
+p.lead{font-size:18px;line-height:1.7;color:var(--muted);margin-bottom:28px}
+.em{color:var(--rose);font-style:italic}
+
+.btn{display:inline-block;border:0;cursor:pointer;text-decoration:none;font:700 17px 'Nunito',sans-serif;
+  padding:15px 34px;border-radius:999px;background:var(--rose);color:#fff;
+  box-shadow:0 8px 22px rgba(217,83,111,.32);transition:transform .15s,box-shadow .15s}
+html[lang="th"] .btn{font-family:'Mali',sans-serif;font-weight:600}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(217,83,111,.38)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:0 6px 18px rgba(43,29,36,.1)}
+
+.dots{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:5}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--rose-soft);transition:all .3s}
+.dots i.on{background:var(--rose);width:22px;border-radius:6px}
+
+/* counter */
+.count{font-family:'Fraunces',serif;font-size:clamp(64px,18vw,110px);color:var(--rose);line-height:1;font-weight:600}
+.count-label{font-size:20px;color:var(--muted);margin:6px 0 22px}
+
+/* reason cards */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:8px 0 28px}
+.card{perspective:800px;height:130px;cursor:pointer}
+.card .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.card.flip .in{transform:rotateY(180deg)}
+.card .f,.card .b{position:absolute;inset:0;border-radius:18px;display:flex;align-items:center;justify-content:center;
+  padding:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card .f{background:var(--rose);color:#fff;font-size:30px;box-shadow:0 6px 16px rgba(217,83,111,.25)}
+.card .b{background:var(--card);transform:rotateY(180deg);font-size:15px;line-height:1.45;
+  box-shadow:0 6px 16px rgba(43,29,36,.08);border:1px solid var(--rose-soft)}
+.hint{font-size:14px;color:var(--muted);margin-bottom:12px}
+
+/* promises */
+.promises{text-align:left;background:var(--card);border-radius:22px;padding:8px 22px;margin-bottom:28px;
+  box-shadow:0 10px 30px rgba(43,29,36,.07)}
+.promises li{list-style:none;padding:15px 0 15px 34px;position:relative;line-height:1.55;font-size:16.5px;
+  border-bottom:1px dashed var(--rose-soft);opacity:0;transform:translateX(-8px);transition:all .5s}
+.promises li:last-child{border:0}
+.promises li.show{opacity:1;transform:none}
+.promises li::before{content:'🤍';position:absolute;left:0;top:14px}
+
+/* flight */
+.flight{position:relative;height:120px;margin:10px 0 26px}
+.flight svg{width:100%;height:100%}
+.place{position:absolute;bottom:0;font-weight:700;font-size:14px;color:var(--muted)}
+.place.l{left:0}.place.r{right:0}
+.plane{position:absolute;font-size:28px;offset-path:path('M 20 95 Q 260 -30 500 95');
+  animation:fly 4.5s ease-in-out infinite;offset-rotate:auto}
+@keyframes fly{0%{offset-distance:0%}85%,100%{offset-distance:100%}}
+
+/* question */
+.qbox{position:relative;min-height:120px;display:flex;gap:16px;justify-content:center;align-items:center;flex-wrap:wrap}
+#yes{font-size:20px;padding:17px 44px}
+#no{background:#fff;color:var(--muted);box-shadow:0 6px 16px rgba(43,29,36,.1);transition:left .25s,top .25s,transform .15s;
+  z-index:30;white-space:nowrap}
+#no.loose{position:fixed}
+.teaser{min-height:26px;margin-top:22px;color:var(--rose);font-weight:700}
+
+/* endings */
+.big-emoji{font-size:72px;margin-bottom:10px;animation:pop .6s ease}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.confetti{position:fixed;top:-30px;pointer-events:none;z-index:40;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.small{font-size:14px;color:var(--muted);margin-top:16px}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+
+<div class="lang">
+  <button data-l="en">EN</button>
+  <button data-l="th">ไทย</button>
+</div>
+
+<main>
+  <!-- 0: intro -->
+  <section class="slide">
+    <h1 class="serif" data-t="s0title"></h1>
+    <p class="lead" data-t="s0body"></p>
+    <button class="btn next" data-t="s0btn"></button>
+  </section>
+
+  <!-- 1: apology -->
+  <section class="slide">
+    <h2 class="serif" data-t="s1title"></h2>
+    <p class="lead" data-t="s1body"></p>
+    <button class="btn next" data-t="next"></button>
+  </section>
+
+  <!-- 2: counter -->
+  <section class="slide">
+    <p class="lead" style="margin-bottom:10px" data-t="s2pre"></p>
+    <div class="count" id="count">0</div>
+    <div class="count-label" data-t="days"></div>
+    <p class="lead" data-t="s2body"></p>
+    <button class="btn next" data-t="next"></button>
+  </section>
+
+  <!-- 3: reasons -->
+  <section class="slide">
+    <h2 class="serif" data-t="s3title"></h2>
+    <p class="hint" data-t="s3hint"></p>
+    <div class="grid" id="grid"></div>
+    <button class="btn next" data-t="next"></button>
+  </section>
+
+  <!-- 4: promises -->
+  <section class="slide" id="promSlide">
+    <h2 class="serif" data-t="s4title"></h2>
+    <ul class="promises" id="promises"></ul>
+    <button class="btn next" data-t="next"></button>
+  </section>
+
+  <!-- 5: meeting -->
+  <section class="slide">
+    <div class="flight">
+      <svg viewBox="0 0 520 110" preserveAspectRatio="none"><path d="M 20 95 Q 260 -30 500 95" fill="none" stroke="#e9b9c3" stroke-width="2" stroke-dasharray="6 7"/></svg>
+      <div class="plane">✈️</div>
+      <span class="place l">🇮🇩 <span data-t="indo"></span></span>
+      <span class="place r"><span data-t="thai"></span> 🇹🇭</span>
+    </div>
+    <h2 class="serif" data-t="s5title"></h2>
+    <p class="lead" data-t="s5body"></p>
+    <button class="btn next" data-t="s5btn"></button>
+  </section>
+
+  <!-- 6: question -->
+  <section class="slide" id="qSlide">
+    <h1 class="serif" data-t="qtitle"></h1>
+    <p class="lead" data-t="qsub"></p>
+    <div class="qbox">
+      <a class="btn" id="yes" target="_blank" rel="noopener" data-t="yes"></a>
+      <button class="btn" id="no" data-t="no"></button>
+    </div>
+    <div class="teaser" id="teaser"></div>
+  </section>
+
+  <!-- 7: yes ending -->
+  <section class="slide" id="yesSlide">
+    <div class="big-emoji">🥹🤍</div>
+    <h1 class="serif" data-t="yTitle"></h1>
+    <p class="lead" data-t="yBody"></p>
+    <a class="btn" id="sendAgain" target="_blank" rel="noopener" data-t="ySend"></a>
+    <p class="small" data-t="yNote"></p>
+  </section>
+
+  <!-- 8: gentle no ending -->
+  <section class="slide" id="noSlide">
+    <div class="big-emoji">🤍</div>
+    <h2 class="serif" data-t="nTitle"></h2>
+    <p class="lead" data-t="nBody"></p>
+    <a class="btn ghost" id="sendNo" target="_blank" rel="noopener" data-t="nSend"></a>
+  </section>
+</main>
+
+<div class="dots" id="dots"></div>
+
+<script>
+/* ======================================================
+   ✏️  CONFIG — change these before you send the link
+   ====================================================== */
+const CONFIG = {
+  HER_NAME: "My Love",            // her name or nickname
+  MY_NAME:  "Xiao",               // your name
+  START_DATE: "",                 // the day you got together, e.g. "2025-08-14" (empty = shows 365+)
+  CHAT_APP: "whatsapp",           // "line" or "whatsapp"
+  WHATSAPP_NUMBER: "62895324778040",            // your WA number with country code, no "+": e.g. "6281234567890"
+  NO_GIVES_UP_AFTER: 12           // after this many escapes the "No" button stops and becomes "I need more time".
+                                  // Set to 0 if you want it to run away forever.
+};
+
+/* ======================================================
+   TEXT (English + Thai) — edit freely, {her}/{me} get replaced
+   ====================================================== */
+const T = {
+ en:{
+  s0title:"Hi, {her} 🤍",
+  s0body:"Before you go… can you give me two minutes? Just read this until the end. That's all I'm asking.",
+  s0btn:"Okay, two minutes",
+  next:"Next →",
+  s1title:"First — I'm sorry.",
+  s1body:"I know what I did hurt you, and I know it left a mark that doesn't just disappear. You don't have to pretend it's okay. I'm not here to make excuses. I'm here to own it.",
+  s2pre:"We've been <span class='em'>us</span> for",
+  days:"days",
+  s2body:"…without ever being in the same room. Over a year of good mornings, late-night calls, and missing you across the sea. That's not nothing. That's us.",
+  s3title:"A few things I'd miss",
+  s3hint:"tap each one",
+  reasons:[
+   "Your laugh, even through a bad connection.",
+   "The way you say my name.",
+   "How you care about people, even when you're tired.",
+   "How you make my days lighter — from another country.",
+   "That you stayed, even when it was hard.",
+   "Just… you. All of you."
+  ],
+  s4title:"What I promise, for real",
+  promises:[
+   "I'll be honest with you, even when it's uncomfortable.",
+   "I'll be patient while you heal. No rushing you.",
+   "I'll prove it with actions, not just words.",
+   "When you doubt me, I'll answer you calmly — not get defensive.",
+   "I'll save up and come to Thailand, so we can finally meet."
+  ],
+  indo:"Indonesia", thai:"Thailand",
+  s5title:"The day I finally get to hug you",
+  s5body:"I still want that day. More than anything. I don't want our story to end before it even gets to that chapter.",
+  s5btn:"One last question",
+  qtitle:"So… will you give us one more chance?",
+  qsub:"No pressure. (Okay, maybe a little pressure.)",
+  yes:"Yes 🤍", no:"No",
+  dodge:["Are you sure?","Think again 🥺","Really really sure?","The button disagrees 😤","Try the other one?","Pretty please?","I'll keep running 🏃","You can't catch it 😌","Last chance to change your mind…","Okay, I'm still here…"],
+  tired:"I need more time",
+  yTitle:"You just made me the happiest person in Indonesia",
+  yBody:"Thank you for giving us another chance, {her}. I won't waste it. I'm opening the chat for you now…",
+  ySend:"Send it to me 💌",
+  yNote:"If the chat didn't open, tap the button above.",
+  yMsg:"Yes, I accept. Let's start again 🤍",
+  nTitle:"Okay. I hear you.",
+  nBody:"Thank you for reading until the end. I'll respect what you need, and I'll give you the time. 🤍",
+  nSend:"Let him know",
+  nMsg:"I read it. I need some time."
+ },
+ th:{
+  s0title:"สวัสดี {her} 🤍",
+  s0body:"ก่อนที่เธอจะไป… ขอเวลาสองนาทีได้ไหม แค่อ่านอันนี้ให้จบก็พอ แค่นั้นเอง",
+  s0btn:"โอเค สองนาที",
+  next:"ต่อไป →",
+  s1title:"ก่อนอื่น เราขอโทษนะ",
+  s1body:"เรารู้ว่าสิ่งที่เราทำมันทำให้เธอเจ็บ และมันทิ้งรอยไว้ที่ไม่ได้หายไปง่ายๆ เธอไม่ต้องแกล้งทำเป็นว่าไม่เป็นไรก็ได้ เราไม่ได้มาเพื่อแก้ตัว เรามาเพื่อยอมรับมัน",
+  s2pre:"เราเป็น <span class='em'>“เรา”</span> กันมาแล้ว",
+  days:"วัน",
+  s2body:"…โดยที่ยังไม่เคยได้อยู่ในห้องเดียวกันเลย กว่าหนึ่งปีของการบอกอรุณสวัสดิ์ คุยกันดึกๆ และคิดถึงเธอข้ามทะเล มันไม่ใช่เรื่องเล็กเลยนะ นั่นคือเรา",
+  s3title:"สิ่งที่เราจะคิดถึง",
+  s3hint:"แตะทีละใบนะ",
+  reasons:[
+   "เสียงหัวเราะของเธอ แม้สัญญาณจะไม่ดีก็ตาม",
+   "วิธีที่เธอเรียกชื่อเรา",
+   "ความใส่ใจที่เธอมีให้คนอื่น แม้ในวันที่เธอเหนื่อย",
+   "เธอทำให้วันของเราเบาขึ้น ทั้งที่อยู่คนละประเทศ",
+   "เธอยังอยู่ตรงนี้ แม้ในวันที่มันยาก",
+   "แค่…เธอ ทุกอย่างที่เป็นเธอ"
+  ],
+  s4title:"สิ่งที่เราสัญญา จริงๆ นะ",
+  promises:[
+   "เราจะซื่อสัตย์กับเธอ แม้มันจะอึดอัดก็ตาม",
+   "เราจะอดทนรอให้เธอค่อยๆ ดีขึ้น ไม่เร่งเธอเลย",
+   "เราจะพิสูจน์ด้วยการกระทำ ไม่ใช่แค่คำพูด",
+   "เวลาเธอไม่แน่ใจในตัวเรา เราจะตอบเธอดีๆ ไม่ตั้งแง่ใส่เธอ",
+   "เราจะเก็บเงินแล้วไปหาเธอที่ไทย ให้ได้เจอกันจริงๆ สักที"
+  ],
+  indo:"อินโดนีเซีย", thai:"ไทย",
+  s5title:"วันที่เราจะได้กอดเธอจริงๆ",
+  s5body:"เรายังอยากให้วันนั้นมาถึง มากกว่าอะไรทั้งหมด เราไม่อยากให้เรื่องของเราจบ ก่อนจะไปถึงบทนั้นเลย",
+  s5btn:"คำถามสุดท้าย",
+  qtitle:"แล้ว… เธอจะให้โอกาสเราอีกสักครั้งไหม?",
+  qsub:"ไม่กดดันนะ (โอเค กดดันนิดนึง)",
+  yes:"ได้ 🤍", no:"ไม่",
+  dodge:["แน่ใจเหรอ?","คิดอีกทีนะ 🥺","แน่ใจจริงๆ เหรอ?","ปุ่มนี้ไม่เห็นด้วยนะ 😤","ลองกดอีกปุ่มดูไหม?","นะๆ ขอร้องล่ะ","เราจะวิ่งหนีไปเรื่อยๆ 🏃","จับไม่ได้หรอก 😌","โอกาสสุดท้ายแล้วนะ…","โอเค เรายังรออยู่ตรงนี้นะ…"],
+  tired:"ขอเวลาอีกหน่อย",
+  yTitle:"เธอเพิ่งทำให้เราเป็นคนที่มีความสุขที่สุดในอินโดนีเซียเลย",
+  yBody:"ขอบคุณที่ให้โอกาสเราอีกครั้งนะ {her} เราจะไม่ทำให้มันเสียเปล่า กำลังเปิดแชทให้นะ…",
+  ySend:"ส่งให้เราหน่อย 💌",
+  yNote:"ถ้าแชทไม่เปิด แตะปุ่มด้านบนได้เลย",
+  yMsg:"ได้ เรายอมรับ มาเริ่มกันใหม่อีกครั้งนะ 🤍",
+  nTitle:"โอเค เราเข้าใจนะ",
+  nBody:"ขอบคุณที่อ่านจนจบนะ เราจะเคารพสิ่งที่เธอต้องการ และจะให้เวลาเธอ 🤍",
+  nSend:"บอกเขาหน่อย",
+  nMsg:"อ่านแล้วนะ ขอเวลาหน่อย"
+ }
+};
+
+/* ====================================================== */
+let lang = 'en';
+try{ lang = localStorage.getItem('omc-lang') || ((navigator.language||'').startsWith('th') ? 'th' : 'en'); }catch(e){}
+const slides=[...document.querySelectorAll('.slide')];
+const MAIN_STEPS=7; // slides 0..6 get dots
+let cur=0, dodges=0, tired=false;
+
+const fill = s => s.replace(/\{her\}/g,CONFIG.HER_NAME).replace(/\{me\}/g,CONFIG.MY_NAME);
+const t = k => T[lang][k];
+
+function chatLink(msg){
+  const m=encodeURIComponent(msg);
+  if(CONFIG.CHAT_APP==='whatsapp' && CONFIG.WHATSAPP_NUMBER)
+    return `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${m}`;
+  return `https://line.me/R/msg/text/?${m}`;
+}
+
+function render(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const v=t(el.dataset.t); if(typeof v==='string') el.innerHTML=fill(v);
+  });
+  if(tired) document.getElementById('no').textContent=t('tired');
+  // reasons
+  const g=document.getElementById('grid'); const flipped=[...g.children].map(c=>c.classList.contains('flip'));
+  g.innerHTML='';
+  t('reasons').forEach((r,i)=>{
+    const c=document.createElement('div'); c.className='card'+(flipped[i]?' flip':'');
+    c.innerHTML=`<div class="in"><div class="f">${['💌','🌙','🌷','☀️','🫶','🤍'][i%6]}</div><div class="b">${fill(r)}</div></div>`;
+    c.onclick=()=>c.classList.toggle('flip'); g.appendChild(c);
+  });
+  // promises
+  const p=document.getElementById('promises'); const shown=p.children.length&&p.children[0].classList.contains('show');
+  p.innerHTML=t('promises').map(x=>`<li class="${shown?'show':''}">${fill(x)}</li>`).join('');
+  // links
+  document.getElementById('yes').href=chatLink(t('yMsg'));
+  document.getElementById('sendAgain').href=chatLink(t('yMsg'));
+  document.getElementById('sendNo').href=chatLink(t('nMsg'));
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+  document.title = lang==='th' ? 'ถึงเธอ 🤍' : 'For You 🤍';
+}
+
+function go(i){
+  slides[cur].classList.remove('on'); cur=i; slides[cur].classList.add('on');
+  const d=document.getElementById('dots');
+  d.style.display = i<MAIN_STEPS ? 'flex':'none';
+  d.innerHTML=Array.from({length:MAIN_STEPS},(_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+  if(i===2) countUp();
+  if(i===4) [...document.querySelectorAll('#promises li')].forEach((li,k)=>setTimeout(()=>li.classList.add('show'),300+k*450));
+  resetNo();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.next').forEach(b=>b.onclick=()=>go(cur+1));
+
+function countUp(){
+  let target=365, plus=true;
+  if(CONFIG.START_DATE){
+    const s=new Date(CONFIG.START_DATE+'T00:00:00');
+    if(!isNaN(s)){ target=Math.floor((Date.now()-s)/864e5); plus=false; }
+  }
+  const el=document.getElementById('count'); const t0=performance.now(), dur=1800;
+  (function step(now){
+    const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+    el.textContent=Math.round(target*e)+(k===1&&plus?'+':'');
+    if(k<1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* runaway No button */
+const no=document.getElementById('no'), teaser=document.getElementById('teaser');
+function resetNo(){ no.classList.remove('loose'); no.style.left=no.style.top=''; }
+function dodge(e){
+  if(tired) return;
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  dodges++;
+  if(CONFIG.NO_GIVES_UP_AFTER>0 && dodges>=CONFIG.NO_GIVES_UP_AFTER){
+    tired=true; resetNo(); no.textContent=t('tired'); teaser.textContent=''; return;
+  }
+  const r=no.getBoundingClientRect(), pad=16;
+  const maxX=window.innerWidth-r.width-pad, maxY=window.innerHeight-r.height-pad;
+  let x,y,tries=0;
+  do{ x=pad+Math.random()*(maxX-pad); y=pad+60+Math.random()*(maxY-pad-60); tries++; }
+  while(tries<20 && Math.hypot(x-r.left,y-r.top)<160);
+  no.classList.add('loose'); no.style.left=x+'px'; no.style.top=y+'px';
+  const d=t('dodge'); teaser.textContent=d[(dodges-1)%d.length];
+}
+no.addEventListener('mouseenter',dodge);
+no.addEventListener('touchstart',dodge,{passive:false});
+no.addEventListener('click',e=>{ if(!tired){dodge(e);return;} go(8); });
+
+/* Yes → celebrate + the link itself opens the chat */
+document.getElementById('yes').addEventListener('click',()=>{
+  resetNo(); confetti(); setTimeout(()=>go(7),150);
+});
+
+function confetti(){
+  const items=['💖','🤍','💕','✨','🌸','💗'];
+  for(let i=0;i<70;i++){
+    const s=document.createElement('div'); s.className='confetti';
+    s.textContent=items[i%items.length];
+    s.style.left=Math.random()*100+'vw'; s.style.fontSize=(16+Math.random()*22)+'px';
+    s.style.animationDuration=(2.5+Math.random()*2.5)+'s'; s.style.animationDelay=Math.random()*.8+'s';
+    document.body.appendChild(s); setTimeout(()=>s.remove(),6000);
+  }
+}
+
+/* background hearts */
+setInterval(()=>{
+  const h=document.createElement('div'); h.className='fh'; h.textContent='♥';
+  h.style.left=Math.random()*100+'vw'; h.style.fontSize=(12+Math.random()*22)+'px';
+  h.style.animationDuration=(9+Math.random()*8)+'s';
+  document.getElementById('hearts').appendChild(h); setTimeout(()=>h.remove(),18000);
+},700);
+
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{
+  lang=b.dataset.l; try{localStorage.setItem('omc-lang',lang)}catch(e){}
+  render(); if(cur===4) document.querySelectorAll('#promises li').forEach(li=>li.classList.add('show'));
+});
+
+render(); go(0);
+</script>
+</body>
